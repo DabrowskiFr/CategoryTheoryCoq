@@ -4,8 +4,8 @@ From Coq.Setoids Require Import Setoid.
 
 From Categories.Category Require Import Category Functor.
 From Categories.Algebra Require Import Algebra.
+
 From Categories.Instances Require Import CategoryType.
-From Categories.Instances Require Import CategoryAlgebra.
 From Categories.Types Require Import Data.
 
 (* We define the endofunctor [Fₙ] over the category of types as 
@@ -18,13 +18,13 @@ Instance Fₙ : Functor Typ Typ := FunctorSum unit.
 
 Instance nat_Algebra : Algebra Fₙ  := 
 {
-    a_u := nat;
-    constr p := match p with inl _ => 0 | inr n => S n end
+    carrier := nat;
+    operation p := match p with inl _ => 0 | inr n => S n end
 }.
 
-Definition nat_to_algebra (B : Algebra Fₙ) : Typ (a_u nat_Algebra) (a_u B) :=
-    fix f n := match n with 0 => constr _ (inl tt) 
-        | S n => constr _ (inr (f n)) end.    
+Definition nat_to_algebra (B : Algebra Fₙ) : Typ (carrier nat_Algebra) (carrier B) :=
+    fix f n := match n with 0 => operation B (inl tt) 
+        | S n => operation B (inr (f n)) end.    
   
 Definition nat_to_algebra_m (B : Algebra Fₙ) : AlgebraMorphism nat_Algebra B.
     refine ({|
@@ -42,8 +42,7 @@ Defined.
     umorph := nat_to_algebra_m
 }.
 Proof.
-    intros b h'.
-    destruct h' as [f H_f].
+    intros b [f H_f].
     assert (nat_to_algebra b = f).
     {
         apply functional_extensionality.

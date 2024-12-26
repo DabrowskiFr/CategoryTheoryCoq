@@ -1,10 +1,8 @@
-From Coq.Logic Require Import FunctionalExtensionality.
 From Coq.Logic Require Import ProofIrrelevance.
 
 From Categories.Category Require Import Category.
 
-(** * Functor *)
-(** ** Definition *)
+(** ** Functor *)
 (** 
   A functor [F : Functor C D] is a mapping between the categories [C] and [D]. 
   - each object [a : C] is mapped to an object [fobj F a : D] and 
@@ -26,22 +24,22 @@ Arguments fmap { _ _ } Functor { _ _ }.
 
 Coercion fobj : Functor >-> Funclass.
 
-(** ** The category of small categories *)
-(** We can form the Cat category whose objects are small categories  
+(** ** Category of small categories *)
+(** We can form the category [Cat] whose objects are small categories  
     and morphisms are functors. *)
 
 #[refine] Instance FunctorId (C : Category) : Functor C C := {
-  fobj := fun x => x;
-  fmap := fun A B f => f }.
+    fobj x := x;
+    fmap _ _ f := f }.
 Proof.
   - reflexivity.
   - reflexivity.
 Defined.
 
-#[refine] Instance FunctorComp (C D E : Category)
+#[refine] Instance FunctorComp {C D E : Category}
   (G : Functor D E) (F : Functor C D)  : Functor C E := {
-    fobj := fun (x : C) => (G (F x));
-    fmap := fun (a b : C) (f : C a b) => fmap G (fmap F f) }.
+    fobj x := G (F x);
+    fmap _ _ f := fmap G (fmap F f) }.
 Proof.
     -   intros.
         do 2 rewrite functors_preserve_identities; reflexivity.
@@ -53,33 +51,16 @@ Defined.
     obj := Category;
     hom := Functor;
     idty := FunctorId;
-    compose := FunctorComp }.
+    compose _ _ _ := FunctorComp }.
 Proof.
-    - destruct f.
-      unfold FunctorId, FunctorComp.
-      f_equal.
-      + apply proof_irrelevance.
-      + apply proof_irrelevance.
-    - destruct f.
-      unfold FunctorId, FunctorComp.
-      f_equal.
-      + apply proof_irrelevance.
-      + apply proof_irrelevance.
-    - destruct f, g, h.
-      unfold FunctorComp; simpl.
-      f_equal.
-      + apply proof_irrelevance.
-      + apply proof_irrelevance.
+    - unfold FunctorId, FunctorComp.
+      destruct f.
+      f_equal; apply proof_irrelevance.
+    - unfold FunctorId, FunctorComp.
+      destruct f.
+      f_equal; apply proof_irrelevance.
+    - unfold FunctorComp; simpl.
+      destruct f, g, h.
+      f_equal; apply proof_irrelevance.
 Defined.
-
-(** ** Adjonctions *)
-(** An adjunction between two categories [C] and [D] is a pair 
-  of functors [F : Cat C D] and [G : Cat D C] together with a natural
-  transformation [iso : NaturalTransformation (idty C) (G ∘ f)]
-  *)
-(* Definition Adjunction {C D : Cat} (F : Cat C D) (G : Cat D C) 
-  (η : NaturalTransformation (idty C) (G ∘ F)) : Type := 
-    forall (x : C) (y : D) (f : C x (G y)),
-    exists! (g : D (F x) y), f = (fmap G g) ∘ (η x). *)
-
 

@@ -4,7 +4,6 @@ From Coq.Setoids Require Import Setoid.
 From Categories.Category Require Import Category Functor.
 From Categories.Algebra Require Import Coalgebra.
 From Categories.Instances Require Import CategoryType.
-From Categories.Instances Require Import CategoryCoAlgebra.
 
 (* From Categories.Types *)
 Require Import Data.
@@ -32,8 +31,8 @@ Instance Fₛ (A : Type) : Functor Typ Typ := FunctorProduct A.
 
 Instance stream_CoAlgebra ( A : Type ) : CoAlgebra (Fₛ A) := 
 {
-    ca_u := stream A;
-    destr := fun p => match p with str a t => (a,t) end
+    carrier := stream A;
+    operation := fun p => match p with str a t => (a,t) end
 }.
 
 #[refine] Instance T (A : Type) : 
@@ -42,9 +41,9 @@ Proof.
     intros.
 Admitted.
 
-Definition hd {A : Type} : stream A -> A := fst ∘ (destr (stream_CoAlgebra A)).
+Definition hd {A : Type} : stream A -> A := fst ∘ (operation (stream_CoAlgebra A)).
 
-Definition tl {A : Type} : stream A -> stream A := snd ∘ (destr (stream_CoAlgebra A)). 
+Definition tl {A : Type} : stream A -> stream A := snd ∘ (operation (stream_CoAlgebra A)). 
 
 Lemma surjective_str : 
     forall (A : Type) (s : stream A), hd s ⋅ tl s = s.
