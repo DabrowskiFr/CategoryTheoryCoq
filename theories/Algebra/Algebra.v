@@ -93,14 +93,96 @@ Proof.
 - apply acat_c.
 Defined.
 
-(* Lemma initial_fix :
+(* Definition lift_obj {C : Category} 
+    (F G : Functor C C) : AlgebraCat F -> AlgebraCat F := 
+        fun A => {| 
+            carrier := F (carrier A); 
+            operation := fmap G (operation A)|}. *)
+
+
+(* Definition lift_obj {C : Category} 
+    (F G : Functor C C) : AlgebraCat F -> AlgebraCat F := 
+        fun A => {| 
+            carrier := G (carrier A); 
+            operation := fmap G (operation A)|}. *)
+
+
+(* generalize to other functors ??? *)
+Definition lift_obj {C : Category} 
+    (F : Functor C C) : AlgebraCat F -> AlgebraCat F := 
+        fun A => {| 
+            carrier := F (carrier A); 
+            operation := fmap F (operation A)|}.
+
+Definition lift_morph {C : Category} (F : Functor C C)
+    (A B : AlgebraCat F) : 
+        AlgebraCat F A B ->
+            AlgebraCat F (lift_obj F A) (lift_obj F B).
+    intro.
+    destruct X.
+    refine ({| f := (fmap F f0 : C (carrier (lift_obj F A)) (carrier (lift_obj F B)))|}).
+    simpl in *.
+    rewrite functors_preserve_composition.
+    rewrite H_f0.
+    rewrite functors_preserve_composition.
+    reflexivity.
+Defined.
+
+Lemma a : forall (C : Category) (F : Functor C C) (A : AlgebraCat F),
+    fmap F (idty (carrier A)) = idty (carrier (lift_obj F A)).
+Proof.
+    intros.
+    simpl.
+    rewrite functors_preserve_identities.
+    reflexivity.
+Qed.
+
+#[refine] Instance FunctorAlgebra {C : Category} (F : Functor C C) : 
+    Functor (AlgebraCat F) (AlgebraCat F) := 
+    {
+        fobj := lift_obj F;
+        fmap := lift_morph F
+    }.
+Proof.
+Admitted.
+
+Definition mkmorphism0 (C : Category) 
+    (F : Functor C C) (A : Algebra F) : 
+    initial (AlgebraCat F) A -> C (carrier A) (F (carrier A)).
+Proof.
+    intro H.
+    destruct H.
+    generalize (umorph (lift_obj F A)); intro.
+    destruct X as [ f _ ]; simpl in *.
+    exact f.
+Defined.
+
+
+Definition mkmorphism1 (C : Category) 
+    (F : Functor C C) (A : Algebra F) : 
+    initial (AlgebraCat F) A -> AlgebraCat F A A.
+Proof.
+Admitted.
+
+(* #[refine] Instance mkmorphism1 (C : Category) 
+    (F : Functor C C) (A : Algebra F) : 
+    Functor C (AlgebraCat F) := 
+    {
+    }.
+    intro a.
+    exact A.
+Admitted.
+ *)
+
+
+Lemma initial_fix :
     forall (C : Category) (F : Functor C C) (A : AlgebraCat F),
     initial (AlgebraCat F) A -> F (carrier A) = (carrier A).
 Proof.
     intros.
     destruct X.
     generalize (umorph_prop A (idty A)); intro.
-Admitted. *)
+Admitted.
 
 (* Check carrier.
 
