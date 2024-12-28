@@ -1,0 +1,238 @@
+\documentclass[12pt]{article}
+\usepackage{microtype}
+\usepackage{a4wide}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{tikz-cd}
+\input{preamble.tex}
+
+\title{Category theory}
+\begin{document}
+
+\section{Category}
+
+\newcommand{\morphs}[3]{\cat{#1}_{#2}^{#3}}
+
+\begin{definition}
+    A category \(\cat{C}\) consists of 
+    \begin{itemize}
+        \item A class \(ob~\cat{C}\), whose elements are called objects, we note \(a : \cat{C}\) if
+            a is an element of \(ob~\cat{C}\).
+        \item A family of classes \(hom~\cat{C}~{a}~{b}\) indexed by pairs of objects \(a\) and \(b\), 
+            whose elements are called morphisms from \(a\) to \(b\), we note \(f : \morphs{C}{a}{b}\)
+            if \(f\) is an element of \(hom~\cat{C}~{a}~{b}\).
+        \item A family of identity morphisms \(\idarrow[a]\) indexed by objects \(a\)
+        \item A binary operation \(\circ\), called composition of morphisms, such that 
+            for any three objects \(a\), \(b\) and \(c\) we have 
+            \begin{equation*}
+                \circ : \morphs{C}{b}{c} \times \morphs{C}{a}{b} \rightarrow \morphs{C}{a}{c}    
+            \end{equation*}
+            such that 
+            \begin{itemize}
+                \item for every \(f : \morphs{C}{a}{b}\) we have
+                \(\idarrow[b] \circ f = f \circ \idarrow[a] = f\)
+                \begin{equation*}
+                    \begin{tikzcd}
+                        a   \arrow[r,"f"]
+                            \arrow[loop,out=150,in=210,distance=20,swap,"{\mathbf{1}}_a"]
+                            \arrow[r,bend left =70,"f\circ{\mathbf{1}}_a"] 
+                            \arrow[r, bend right = 70,swap,"{\mathbf{1}}_b\circ f"]&
+                        b   \arrow[loop,out=30,in=-30,distance=20,"{\mathbf{1}}_b"]
+                    \end{tikzcd}
+                \end{equation*}
+                \item $\circ$ is associative, i.e. for every \(f : \morphs{C}{a}{b}\), 
+                \(g : \morphs{C}{b}{c}\) and \(h : \morphs{C}{c}{d}\) we have
+                \(h \circ (g \circ f) = (h \circ g) \circ f\)
+                \begin{equation*}
+                    \begin{tikzcd}
+                        a   \arrow[r,"f"]
+                            \arrow[dr, swap,"g \circ f"]& 
+                        b   \arrow[dr,"g \circ h"] 
+                            \arrow[d,swap,"g"]\\
+                        {} & 
+                        c \arrow[r,swap,"h"] & 
+                        d
+                    \end{tikzcd}
+                \end{equation*}
+                
+            \end{itemize}
+    \end{itemize}
+\end{definition}
+
+\section{Properties of morphisms}
+
+A monomorphism is a left-cancellative morphism.
+\begin{definition}
+    Let \(\cat{C}\) be a category and \(a,b:\cat{C}\), a morphism \(f : \morphs{C} {b} {c}\) is a monomorphism
+    if, for every \(g, h : \morphs{C}{a}{b}\), the equality \(f \circ g = f \circ h\) implies that \(g=h\). 
+\end{definition}
+
+\begin{definition}
+    Let \(\cat{C}\) be a category and \(a,b:\cat{C}\), a morphism \(f : \morphs{C} {a} {b}\) is an epimorphism
+    if, for every \(g, h : \morphs{C}{b}{c}\), the equality \(g \circ f = h \circ f \) implies that \(g=h\). 
+\end{definition}
+
+\begin{definition}
+    Let \(\cat{C}\) be a category and \(a,b:\cat{C}\), a morphism \(f : \morphs{C} {a} {b}\) is an isomorphism if there exists \(f^{-1} : \morphs{C}{b}{a}\), called the inverse of \(f\), such that \(f^{-1} \circ f = \idarrow[a]\) and 
+    \(f \circ f^{-1} = \idarrow[b]\).
+\end{definition}
+
+In general, a morphism that is both a monomorphism and an epimorphism is not a isomorphism.
+
+A retraction is the left-inverse of a morphism.
+\begin{definition}
+    Let \(\cat{C}\) be a category, \(a,b:\cat{C}\) and \(f : \morphs{C}{a}{b}\),
+    a morphism \( g : \morphs{C}{b}{a}\) is a retraction of \(f\) if 
+    \(g \circ f = \idarrow[a]\).
+\end{definition}
+A section is the right-inverse of a morphism.
+\begin{definition}
+    Let \(\cat{C}\) be a category, \(a,b:\cat{C}\) and \(f : \morphs{C} {a} {b}\),
+    a morphism \( g : \morphs{C}{b}{a}\) is a section of \(f\) if 
+    \(f \circ g = \idarrow[b]\).
+\end{definition}
+
+\begin{lemma}
+    Let \(\cat{C}\) be a category, \(a,b:\cat{C}\),
+    if \(g : \morphs{C}{b}{a}\) is a section of some \(f :\morphs{C}{a}{b}\) then it is also a monomorphism.
+\end{lemma}
+
+\begin{lemma}
+    Let \(\cat{C}\) be a category, \(a,b:\cat{C}\) and \(f : \morphs{C} {a} {b}\),
+    if \(g : \morphs{C} {b} {a}\) is a retraction of some \(f :\morphs{C}{a}{b}\) then it is also an epimorphism.
+\end{lemma}
+
+\begin{lemma}
+    Let \(\cat{C}\) be a category and \(b c:\cat{C}\), \(f : \morphs{C} {b} {c}\) 
+    is an isomorphism then it is also an monomorphism.
+\end{lemma}
+\begin{proof}
+    By definition of a monomorphism, we must prove that, for all \(a:\cat{C}\) and for all \(g, h:\morphs{C}{a}{b}\),
+    the equality \(f \circ g = f \circ h\) implies \(g = h\).
+    By the hypothesis on \(f\), there exists an inverse \(f^{-1}\) such that \(f^{-1}\circ f = \idarrow[a]\), Using the properties of composition, we can express \(g\) as \(f^{-1} \circ (f \circ g)\).
+    From the equality hypothesis, we have \(g = f^{-1} \circ (f \circ h)\).
+    Finally, using the properties of composition again, we conclude that $g = h$.
+\end{proof}
+
+\begin{lemma}
+    Let \(\cat{C}\) be a category and \(a,b:\cat{C}\), \(f : \morphs{C} {a} {b}\) 
+    is an isomorphism then it is also an epimorphism.
+\end{lemma}
+\begin{proof}
+By definition of an epimorphism, we must prove that, for all \(c:\cat{C}\) and for all \(g, h:\morphs{C}{b}{c}\),
+the equality \(g \circ f = h \circ f\) implies \(g = h\).
+By the hypothesis on \(f\), there exists an inverse \(f^{-1}\) such that \(f\circ f^{-1} = \idarrow[b]\), Using the properties of composition, we can express \(g\) as \(g \circ f \circ f^{-1}\).
+From the equality hypothesis, we have \(g = h \circ f \circ f^{-1}\).
+Finally, using the properties of composition again, we conclude that $g = h$.
+\end{proof}
+\begin{lemma} 
+    Let \(\cat{C}\) be a category and \(a,b:\cat{C}\), if \(g : \morphs{C} {b} {b
+    a}\) is both a retraction and a monomorphism then it is also an isomorphism. 
+\end{lemma}
+\begin{proof}
+    By definition of an isomorphism we must find a morphism \(g^{-1} : \morphs{C}{a}{b}\) such that \(g \circ g^{-1} = \idarrow[a]\) and \(g^{-1} \circ g = \idarrow[b]\).
+    By hypothesis, \(g\) is a retraction, thus there exists \(f : \morphs{C}{a}{b}\) such that the equation \(g \circ f = \idarrow[a]\) holds. To prove that \(g\) is an isomorphism, it suffice to prove that \(f \circ g = \idarrow[b]\). Using the properties of composition and the equation we have   
+    \( g \circ (f \circ g) = g \circ \idarrow[b]\).
+    But, by hypothesis, \(g\) is also a monorphism and thus we have
+    \((f \circ g) = \idarrow[b]\).
+\end{proof}
+
+\begin{lemma} 
+    Let \(\cat{C}\) be a category and \(a,b:\cat{C}\), if \(g : \morphs{C} {b} {a}\) is both a section and an epimorphism then it is also an isomorphism. 
+\end{lemma}
+\begin{proof}
+    By definition of an isomorphism we must find a morphism \(g^{-1} : \morphs{C}{a}{b}\) such that \(g \circ g^{-1} = \idarrow[b]\) and \(g^{-1} \circ g = \idarrow[a]\).
+    By hypothesis, \(g\) is a section, thus there exists \(f : \morphs{C}{a}{b}\) such that the equation \(f \circ g = \idarrow[b]\) holds. To prove that \(g\) is an isomorphism, it suffice to prove that \(g \circ f = \idarrow[a]\). Using the properties of composition and the equation we have   
+    \( g \circ f \circ g = \idarrow[a] \circ g\).
+    But, by hypothesis, \(g\) is also a monorphism and thus we have
+    \((g \circ f) = \idarrow[a]\).
+\end{proof}
+
+
+\section{Functors}
+
+\begin{definition}
+    Given two categories \(\cat{C}\) and \(\cat{D}\), a functor from \(\cat{C}\) to \(\cat{D}\) is a mapping that 
+    \begin{itemize}
+        \item associates each \(a : \cat{C}\) to an object \(F a : \cat{D}\)
+        \item associates each \(f : \morphs{C}{a}{b}\) to a morphism \(F f : \morphs{D}{F a}{F b}\)
+        such that the following conditions hold 
+        \begin{itemize}
+            \item \(F \idarrow[a] = \idarrow[F a]\)
+            \item \(F (g \circ f) = F g \circ F f\)
+        \end{itemize}
+        \begin{equation*}
+            \begin{tikzcd}
+                F a \arrow[r,"F f"]
+                    \arrow[rr, bend left=70,"F (g\circ f)"]
+                    \arrow[rr, bend right=70,"(F g) \circ (F f)"] 
+                &
+                F b \arrow[r,"F g"]
+                & 
+                F c
+            \end{tikzcd}
+        \end{equation*}
+    \end{itemize}
+\end{definition}
+
+\begin{paragraph}{Identity functor}
+Given a category \(\cat{C}\), we define the identity mapping \(\idarrow[\cat{C}]\) by
+\(\idarrow[\cat{C}] a = a\) and \(\idarrow[\cat{C}] f = f\) for all \(a:\cat{C}\)
+and \(f:\morphs{C}{a}{b}\). Obviously, \(\idarrow[\cat{C}]\) is a functor
+as by definition we have 
+\(\idarrow[\cat{C}] \idarrow[a] = \idarrow[\cat{C} a]\) and 
+\(\idarrow[\cat{C}] (g \circ f) = \idarrow[\cat{C}]g\circ\idarrow[\cat{C}] f\)
+\end{paragraph}
+\begin{paragraph}{Composition of functors}
+We define a composition operator $\circ$ that, 
+given three categories \(\cat{C}\), \(\cat{D}\) and \(\cat{E}\), associates
+two functors $G$ from \(\cat{D}\) to \(\cat{E}\) and $F$ from \(\cat{C}\) and \(\cat{D}\) to the functor \(G \circ F\) defined by 
+\((G \circ F) a = G (F a)\) and \((G \circ F) f = G (F f)\) for all \(a:\cat{C}\)
+and \(f:\morphs{C}{a}{b}\).
+Obviously \(G \circ F\) is a functor as from properties of $G$ and $F$ we have
+\begin{itemize}
+\item \((G \circ F) \idarrow[a] = G(\idarrow[F a]) = \idarrow[(G\circ F)a]\)
+\item \((G \circ F)(g \circ f) = 
+    G (F g \circ F f) = (G \circ F) g \circ (G \circ F) f\)
+\end{itemize}
+\end{paragraph}
+
+
+The category \(\cat{Cat}\) is the category whose objects are small categories
+and morphisms from \(C:\cat{Cat}\) to \(D:\cat{Cat}\) are functors from
+from \(C:\cat{Cat}\) to \(D:\cat{Cat}\).
+The identify functor \(\idarrow[C]\) from \(C\) to \(C\) and the composition
+\((G \circ F)\) from \(C\) to \(E\) of two functors \(F\) from \(C\) to \(D\) and \(G\) from \(D\) to \(E\) are defined by
+\begin{itemize}
+    \item \(\idarrow[C] a = a\) for all \(a : \cat{C}\)
+    \item \(\idarrow[C] f = f\) for all \(f : \morphs{C}{a}{b}\)
+    \item \((G \circ F) a = G (F a)\) for all \(a : \cat{C}\) 
+    \item \((G \circ F) f = G (F f)\) for all \(f : \morphs{C}{a}{b}\)
+\end{itemize}
+
+\begin{proposition}
+    Small categories and functors together with the composition of functors 
+    form a category
+\end{proposition}
+\begin{proof}
+\begin{itemize}
+    \item left and right identities 
+    \item associativity
+\end{itemize}
+\end{proof}
+
+\section{Category of small categories}
+
+The category \(\mathbf{Cat}\) of small categories is the category whose objects are small categories
+and morphisms are functors.
+
+\begin{itemize}
+    \item The identity functor is defined by \(\idarrow[C] x = x\) and \(\idarrow[C] f = f\)
+    \item The composition operator is defined by \((G \circ F) a = G(F a)\) and \((G \circ F) f = G(F f)\)
+\end{itemize}
+We have to prove that 
+\begin{itemize}
+    \item 
+\end{itemize}
+
+initial object empty, the terminal is the singleton.
+\end{document}

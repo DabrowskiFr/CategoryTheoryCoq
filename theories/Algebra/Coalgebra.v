@@ -44,7 +44,7 @@ Definition acompose {C : Category} (F : Functor C C)
         CoAlgebraMorphism b c -> CoAlgebraMorphism a b -> CoAlgebraMorphism a c.
     intros.
         refine ({|f:=compose X X0 |}).
-        rewrite <- functors_preserve_composition.
+        rewrite functors_preserve_composition.
         destruct X, X0.
         simpl.
         rewrite compose_assoc.

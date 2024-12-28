@@ -145,3 +145,4 @@ Class CartesianClosed `{@Cartesian C} : Type := {
             exists! (curry_g : C q (exp o1 o2)),
                 g = eval o1 o2 ∘ (curry_g ⨉ (idty _ ))
 }.
+

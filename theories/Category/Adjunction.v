@@ -7,3 +7,5 @@
   (η : NaturalTransformation (idty C) (G ∘ F)) : Type := 
     forall (x : C) (y : D) (f : C x (G y)),
     exists! (g : D (F x) y), f = (fmap G g) ∘ (η x). *)
+    
+    (* 𝟙 *)

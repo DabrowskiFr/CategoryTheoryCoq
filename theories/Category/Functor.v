@@ -18,7 +18,7 @@ Class Functor (C : Category) (D : Category) : Type := {
     fmap (idty a) = idty (fobj a);
   functors_preserve_composition {a b c : C} : 
       forall (g : C b c) (h : C a b),
-        (fmap g ∘ fmap h) = fmap (g ∘ h) }.
+      fmap (g ∘ h) = (fmap g ∘ fmap h)}.
 
 Arguments fmap { _ _ } Functor { _ _ }.
 
@@ -42,10 +42,42 @@ Defined.
     fmap _ _ f := fmap G (fmap F f) }.
 Proof.
     -   intros.
-        do 2 rewrite functors_preserve_identities; reflexivity.
+        rewrite functors_preserve_identities.
+        rewrite functors_preserve_identities. 
+        reflexivity.
     -   intros.
-        do 2 rewrite functors_preserve_composition; reflexivity.
+        rewrite functors_preserve_composition.
+        rewrite functors_preserve_composition.
+        reflexivity.
 Defined.
+
+Definition ax : 
+  forall (C D : Category) (F G : Functor C D) (H : @fobj C D F = @fobj C D G)
+    (f : forall a b : C, C a b -> D (G a) (G b)), 
+    forall a b : C, C a b -> D (F a) (F b).
+Proof.
+  intros.
+  rewrite H.
+  exact (f a b X).
+Defined.
+
+
+
+
+(* functional equality *)
+
+Lemma proof_irrelevance_in_functors : forall (C D : Category) (F G : Functor C D)
+  (H : @fobj C D F = @fobj C D G) 
+  (H1 : @fmap C D F = ax C D F G H (@fmap C D G)),
+  F = G.
+Proof.
+  intros C D F G Heq1 Heq2.
+  destruct F, G.
+  unfold ax in *.
+  simpl in *.
+  subst.
+  f_equal; apply proof_irrelevance.
+Qed.
 
 #[refine] Instance Cat : Category := {
     obj := Category;
@@ -64,3 +96,9 @@ Proof.
       f_equal; apply proof_irrelevance.
 Defined.
 
+(* TODO : 
+  (1) prove Cat with lemma ax 
+  (2) try to obtain functor equality using directly eq_rect_r*)
+Check (forall (C D : Category) (F G : Functor C D) (a b : C) (f : C a b) (H : @fobj C D F = @fobj C D G), 
+  eq_rect_r (fun o : C -> D => D (o a) (o b)) (@fmap C D G a b f) H = 
+    @fmap C D F a b f).

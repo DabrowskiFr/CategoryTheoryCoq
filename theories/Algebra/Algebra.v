@@ -1,4 +1,4 @@
-From Categories.Category Require Import Category Functor.
+From Categories.Category Require Import Category MorphismTheory Functor.
 
 (** ** Algebra *)
 (** Given a endofunctor F of a category C, a F-algebra [Algebra F]
@@ -30,7 +30,7 @@ Arguments Algebra {C} F.
 Arguments carrier {C F} _.
 Arguments operation {C F} _.
 Arguments AlgebraMorphism {C F} _ _.
-Coercion f : AlgebraMorphism >-> hom.
+(* Coercion f : AlgebraMorphism >-> hom. *)
 
 (* morphisms are simply morphism of the category *)
 
@@ -47,15 +47,16 @@ Defined.
 Definition acompose {C : Category} (F : Functor C C) 
     (a b c : Algebra F) : 
         AlgebraMorphism b c -> AlgebraMorphism a b -> AlgebraMorphism a c.
-    intros.
-        refine ({|f:=compose X X0 |}).
-        rewrite <- functors_preserve_composition.
-        destruct X, X0.
+        intros g f.     
+        destruct g as [g Hg].
+        destruct f as [f Hf].
+        refine ({|f := g ∘ f |}).
+        rewrite functors_preserve_composition.
         simpl.
         rewrite compose_assoc.
-        rewrite H_f0.
+        rewrite Hg.
         rewrite <- compose_assoc.
-        rewrite H_f1.
+        rewrite Hf.
         rewrite compose_assoc.
         reflexivity.
     Defined.
@@ -122,11 +123,32 @@ Definition lift_morph {C : Category} (F : Functor C C)
     destruct X.
     refine ({| f := (fmap F f0 : C (carrier (lift_obj F A)) (carrier (lift_obj F B)))|}).
     simpl in *.
-    rewrite functors_preserve_composition.
+    rewrite <- functors_preserve_composition.
     rewrite H_f0.
-    rewrite functors_preserve_composition.
+    rewrite <- functors_preserve_composition.
     reflexivity.
 Defined.
+
+Lemma initial_fix :
+    forall (C : Category) (F : Functor C C) (A : AlgebraCat F),
+        initial (AlgebraCat F) A -> isomorphic (F (carrier A)) (carrier A).
+Proof.
+    intros C F A Ha.
+    set (B := {| carrier := F (carrier A); operation := fmap F (operation A)|}).
+    assert (AlgebraCat F A B) as f.
+    {
+        exact (umorph B).
+    }
+    set (g := {|f := operation A : C (carrier B) (carrier A); H_f := eq_refl|} : AlgebraCat F B A).
+    assert (g ∘ f = idty A).
+    {
+        destruct Ha.
+        rewrite umorph_prop.
+        exact (umorph_prop _ ((g : AlgebraCat F B A) ∘ f)).
+    }
+    assert (f ∘ g = idty _).
+Abort.
+
 
 Lemma a : forall (C : Category) (F : Functor C C) (A : AlgebraCat F),
     fmap F (idty (carrier A)) = idty (carrier (lift_obj F A)).
@@ -175,14 +197,6 @@ Admitted.
  *)
 
 
-Lemma initial_fix :
-    forall (C : Category) (F : Functor C C) (A : AlgebraCat F),
-    initial (AlgebraCat F) A -> F (carrier A) = (carrier A).
-Proof.
-    intros.
-    destruct X.
-    generalize (umorph_prop A (idty A)); intro.
-Admitted.
 
 (* Check carrier.
 
